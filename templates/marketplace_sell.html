@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sell Crop | AgroScore</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div>
+          <h1>Sell crops</h1>
+          <p>List your produce and reach local buyers quickly.</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/marketplace-buy">Buy crops</a>
+        <a href="/orders">Orders</a>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <article class="panel">
+        <p class="badge">For farmers</p>
+        <h2>List your crop in minutes</h2>
+        <p class="muted">Add quantity, price per quintal, transport details, and location so buyers can find you instantly.</p>
+      </article>
+      <article class="panel">
+        <form id="sellForm">
+          <input id="crop_name" placeholder="Crop name" required />
+          <input id="quantity_quintal" type="number" step="0.1" placeholder="Quantity in quintal" required />
+          <input id="price_per_quintal" type="number" step="0.01" placeholder="Price per quintal (₹)" required />
+          <input id="location" placeholder="District / mandi" required />
+          <textarea id="description" placeholder="Crop quality, grade, transport notes"></textarea>
+          <label class="small"><input id="transport_available" type="checkbox" /> Transport available</label>
+          <input id="transport_cost_per_km" type="number" step="0.1" placeholder="Transport cost per km" />
+          <button type="submit">List for sale</button>
+        </form>
+        <div id="message" class="message"></div>
+      </article>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById('sellForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in before creating a listing.');
+        return;
+      }
+      const payload = {
+        crop_name: document.getElementById('crop_name').value,
+        quantity_quintal: Number(document.getElementById('quantity_quintal').value),
+        price_per_quintal: Number(document.getElementById('price_per_quintal').value),
+        location: document.getElementById('location').value,
+        description: document.getElementById('description').value,
+        transport_available: document.getElementById('transport_available').checked,
+        transport_cost_per_km: Number(document.getElementById('transport_cost_per_km').value || 0),
+      };
+      const res = await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      document.getElementById('message').textContent = data.message || 'Listing created';
+      if (res.ok) {
+        document.getElementById('sellForm').reset();
+      }
+    });
+  </script>
+</body>
+</html>

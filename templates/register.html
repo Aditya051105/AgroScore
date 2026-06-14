@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Register</title>
+</head>
+
+<body>
+
+<h1>Farmer Registration</h1>
+<form id="registerForm">
+
+    <input type="text" id="name" placeholder="Full Name" required>
+
+    <input type="text" id="phone" placeholder="Phone Number" required>
+
+    <input type="password" id="password" placeholder="Password" required>
+
+    <input type="text" id="aadhaar" placeholder="Aadhaar Last 4 Digits">
+
+    <input type="text" id="state" placeholder="State">
+
+    <input type="text" id="district" placeholder="District">
+
+    <input type="text" id="village" placeholder="Village">
+
+    <input type="number" id="land" placeholder="Land Area (Acres)">
+
+    <input type="text" id="landType" placeholder="Land Type">
+
+    <input type="text" id="water" placeholder="Water Source">
+
+    <button type="submit">
+        Register
+    </button>
+
+</form>
+
+<script>
+document
+.getElementById("registerForm")
+.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const data = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        password: document.getElementById("password").value,
+        aadhaar_last4: document.getElementById("aadhaar").value,
+        state: document.getElementById("state").value,
+        district: document.getElementById("district").value,
+        village: document.getElementById("village").value,
+        land_area_acres: document.getElementById("land").value,
+        land_type: document.getElementById("landType").value,
+        water_source: document.getElementById("water").value
+    };
+
+    const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+
+        alert("Registration Successful!");
+
+        window.location.href = "/login";
+
+    } else {
+
+        alert(result.message || "Registration failed");
+
+    }
+
+});
+
+</script>

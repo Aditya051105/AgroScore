@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buy Crop | AgroScore</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div>
+          <h1>Buy crops</h1>
+          <p>Farmers and local traders can place orders here.</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/marketplace-sell">Sell crops</a>
+        <a href="/orders">Orders</a>
+      </nav>
+    </div>
+
+    <section class="panel">
+      <p class="badge">Marketplace</p>
+      <h2>Buy crops from local farmers</h2>
+      <p class="muted">Compare price per kg and per quintal, then place a live order in one click.</p>
+      <div id="listings" class="listing-grid"></div>
+    </section>
+  </div>
+
+  <script>
+    async function loadListings() {
+      const res = await fetch('/api/listings');
+      const listings = await res.json();
+      const mount = document.getElementById('listings');
+      mount.innerHTML = listings.map(item => `
+        <article class="listing-card">
+          <p class="badge">${item.crop_name}</p>
+          <h3>${item.crop_name}</h3>
+          <p class="small">${item.farmer_name} • ${item.location}</p>
+          <p class="small">Qty: ${item.quantity_quintal} quintal (${item.quantity_kg} kg)</p>
+          <p class="small">Price: ₹${Number(item.price_per_quintal).toLocaleString('en-IN')}/quintal</p>
+          <p class="small">Equivalent: ₹${Number(item.price_per_kg).toLocaleString('en-IN')}/kg</p>
+          <p>${item.description || 'Fresh produce available for local delivery.'}</p>
+          <button onclick="placeOrder(${item.id}, ${item.price_per_kg})">Buy now</button>
+        </article>
+      `).join('');
+    }
+
+    async function placeOrder(listingId, pricePerKg) {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in first to place an order.');
+        return;
+      }
+      const quantityKg = Number(prompt('Enter quantity in kg', '10')) || 0;
+      if (!quantityKg) return;
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ listing_id: listingId, quantity_kg: quantityKg, price_per_kg: pricePerKg, razorpay_order_id: 'demo_order_' + listingId, payment_id: 'demo_payment_' + listingId })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        alert('Order placed successfully.\nOrder ID: ' + data.order_id + '\nAmount: ₹' + Number(data.total_amount).toLocaleString('en-IN'));
+      } else {
+        alert(data.message || 'Unable to place order right now.');
+      }
+    }
+    
+    async function buyNow(listingId){
+
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+        "/api/orders/create",
+        {
+            method: "POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + token
+            },
+            body: JSON.stringify({
+                listing_id: listingId,
+                quantity: 1
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    alert("Order Created: " + data.order_id);
+   }
+    loadListings();
+  </script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Crop Records</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static',
+filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<h1>Crop Records</h1>
+
+<form id="cropForm">
+
+<input
+type="text"
+id="crop_name"
+placeholder="Crop Name"
+required>
+
+<input
+type="text"
+id="season"
+placeholder="Season"
+required>
+
+<input
+type="number"
+id="year"
+placeholder="Year"
+required>
+
+<input
+type="number"
+id="area"
+placeholder="Area (Acres)"
+required>
+
+<input
+type="number"
+id="expected"
+placeholder="Expected Yield (Quintal)"
+required>
+
+<input
+type="number"
+id="actual"
+placeholder="Actual Yield (Quintal)"
+required>
+
+<input
+type="number"
+id="seed"
+placeholder="Seed Cost"
+required>
+
+<input
+type="number"
+id="fertilizer"
+placeholder="Fertilizer Cost"
+required>
+
+<input
+type="number"
+id="labor"
+placeholder="Labor Cost"
+required>
+
+<input
+type="number"
+id="transport"
+placeholder="Transport Cost"
+required>
+
+<input
+type="number"
+id="other"
+placeholder="Other Cost"
+required>
+
+<input
+type="number"
+id="selling_price"
+placeholder="Selling Price Per Quintal"
+required>
+
+<button type="submit">
+
+Add Crop Record
+
+</button>
+
+</form>
+
+<hr>
+
+<h2>My Crop Records</h2>
+
+<table border="1">
+
+<thead>
+
+<tr>
+
+<th>Crop</th>
+<th>Season</th>
+<th>Profit</th>
+
+</tr>
+
+</thead>
+
+<tbody id="cropTable">
+
+</tbody>
+
+</table>
+
+<script>
+
+loadCrops();
+
+document
+.getElementById("cropForm")
+.addEventListener(
+"submit",
+addCrop
+);
+
+async function addCrop(e){
+
+e.preventDefault();
+
+const token =
+localStorage.getItem(
+"token"
+);
+
+const response =
+await fetch(
+"/api/crops/add",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+
+Authorization:
+"Bearer " + token
+},
+
+body:JSON.stringify({
+
+crop_name:
+document.getElementById(
+"crop_name"
+).value,
+
+season:
+document.getElementById(
+"season"
+).value,
+
+year:
+document.getElementById(
+"year"
+).value,
+
+area_sown_acres:
+document.getElementById(
+"area"
+).value,
+
+expected_yield_quintal:
+document.getElementById(
+"expected"
+).value,
+
+actual_yield_quintal:
+document.getElementById(
+"actual"
+).value,
+
+seed_cost:
+document.getElementById(
+"seed"
+).value,
+
+fertilizer_cost:
+document.getElementById(
+"fertilizer"
+).value,
+
+labor_cost:
+document.getElementById(
+"labor"
+).value,
+
+transport_cost:
+document.getElementById(
+"transport"
+).value,
+
+other_cost:
+document.getElementById(
+"other"
+).value,
+
+selling_price_per_quintal:
+document.getElementById(
+"selling_price"
+).value
+
+})
+
+}
+);
+
+const result =
+await response.json();
+
+alert(
+"Profit: ₹" +
+result.profit
+);
+
+loadCrops();
+
+}
+
+async function loadCrops(){
+
+const token =
+localStorage.getItem(
+"token"
+);
+
+const response =
+await fetch(
+"/api/crops/all",
+{
+headers:{
+Authorization:
+"Bearer " + token
+}
+}
+);
+
+const crops =
+await response.json();
+
+let html = "";
+
+crops.forEach(crop=>{
+
+html += `
+<tr>
+
+<td>${crop.crop}</td>
+
+<td>${crop.season}</td>
+
+<td>₹${crop.profit}</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById(
+"cropTable"
+).innerHTML = html;
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orders | AgroScore</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div>
+          <h1>Orders & payments</h1>
+          <p>Track quantity, amount, order ID, and delivery updates.</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/marketplace-buy">Buy crops</a>
+        <a href="/marketplace-sell">Sell crops</a>
+      </nav>
+    </div>
+
+    <section class="panel">
+      <p class="badge">Recent orders</p>
+      <div id="orders" class="order-grid"></div>
+    </section>
+  </div>
+
+  <script>
+    async function loadOrders() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        document.getElementById('orders').innerHTML = '<article class="order-card"><p>Please log in to see your orders.</p></article>';
+        return;
+      }
+      const res = await fetch('/api/orders', { headers: { 'Authorization': 'Bearer ' + token } });
+      const orders = await res.json();
+      document.getElementById('orders').innerHTML = orders.map(order => `
+        <article class="order-card">
+          <p class="badge">Order #${order.id}</p>
+          <h3>Status: ${order.status}</h3>
+          <p class="small">Escrow: ${order.escrow_status}</p>
+          <p class="small">Quantity: ${order.quantity_kg || order.quantity} kg</p>
+          <p class="small">Amount: ₹${Number(order.total_amount).toLocaleString('en-IN')}</p>
+          <p class="small">Price: ₹${Number(order.price_per_kg || 0).toLocaleString('en-IN')}/kg</p>
+          <p class="small">Order ID: ${order.razorpay_order_id || 'demo_order'}</p>
+          <p class="small">Payment ID: ${order.payment_id || 'demo_payment'}</p>
+        </article>
+      `).join('');
+    }
+    loadOrders();
+  </script>
+</body>
+</html>

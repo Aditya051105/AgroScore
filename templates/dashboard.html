@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AgroScore Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">A</div>
+        <div>
+          <h1>AgroScore</h1>
+          <p>Farmer intelligence dashboard</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/marketplace-buy">Buy crops</a>
+        <a href="/marketplace-sell">Sell crops</a>
+        <a href="/orders">Orders</a>
+        <a href="/profile">Profile</a>
+      </nav>
+    </div>
+
+    <section class="hero">
+      <article class="panel">
+        <p class="badge">Welcome back</p>
+        <h2 id="welcome">Welcome farmer</h2>
+        <p class="muted">Track day-wise sales, day-wise buying, profit trends, and inventory from one place.</p>
+        <div class="quick-grid">
+          <div class="quick-card">
+            <strong>Marketplace</strong>
+            <p class="small">Buy fresh crops or list what you have ready to sell.</p>
+            <a href="/marketplace-buy">Open buy market</a>
+          </div>
+          <div class="quick-card">
+            <strong>Orders</strong>
+            <p class="small">Review order status, payment ID, and total amount.</p>
+            <a href="/orders">View orders</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h3>Farm overview</h3>
+        <div class="cards">
+          <div class="card">
+            <div class="metric-label">Credit Score</div>
+            <div class="metric-value">742</div>
+          </div>
+          <div class="card">
+            <div class="metric-label">Total Profit</div>
+            <div id="metricProfit" class="metric-value">₹0</div>
+          </div>
+          <div class="card">
+            <div class="metric-label">Listings</div>
+            <div id="metricListings" class="metric-value">0</div>
+          </div>
+          <div class="card">
+            <div class="metric-label">Orders</div>
+            <div id="metricOrders" class="metric-value">0</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="grid">
+      <article class="panel">
+        <h3>Day-wise selling</h3>
+        <canvas id="sellingChart"></canvas>
+      </article>
+      <article class="panel">
+        <h3>Day-wise buying</h3>
+        <canvas id="buyingChart"></canvas>
+      </article>
+      <article class="panel">
+        <h3>Profit graph</h3>
+        <canvas id="profitChart"></canvas>
+      </article>
+      <article class="panel">
+        <h3>Insights</h3>
+        <ul id="insightsList" class="small"></ul>
+      </article>
+    </section>
+
+    <section class="hero">
+      <article class="panel">
+        <h3>Manual crop inventory</h3>
+        <p class="muted">Add crops manually as an inventory shop entry for your marketplace.</p>
+        <form id="inventoryForm">
+          <input id="inventoryCrop" type="text" placeholder="Crop name" required />
+          <input id="inventoryQty" type="number" step="0.1" placeholder="Quantity in quintal" required />
+          <input id="inventoryPrice" type="number" step="0.01" placeholder="Price per quintal (₹)" required />
+          <input id="inventoryLocation" type="text" placeholder="District / mandi" />
+          <textarea id="inventoryDescription" placeholder="Quality, grade, storage notes"></textarea>
+          <button type="submit">Add inventory item</button>
+        </form>
+        <div id="inventoryMessage" class="message"></div>
+      </article>
+
+      <article class="panel">
+        <h3>Inventory shop</h3>
+        <div id="inventoryList" class="grid"></div>
+      </article>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script>
+    document.getElementById('welcome').innerText = 'Welcome ' + (localStorage.getItem('farmer_name') || 'Farmer');
+  </script>
+</body>
+</html>
